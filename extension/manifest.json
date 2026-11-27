@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "天下廣告訂版 Cue 助手",
+  "description": "在已登入的訂單旁讀取權益、核對逐日庫存，試排並複製 Cue。",
+  "version": "0.1.0",
+  "minimum_chrome_version": "116",
+  "permissions": ["sidePanel", "storage"],
+  "host_permissions": ["https://ad-pro.cwg.tw/*"],
+  "background": {"service_worker": "background.mjs", "type": "module"},
+  "action": {"default_title": "開啟 Cue 助手"},
+  "side_panel": {"default_path": "panel.html"},
+  "content_scripts": [{
+    "matches": ["https://ad-pro.cwg.tw/*"],
+    "js": ["reader.js"],
+    "run_at": "document_idle"
+  }],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; object-src 'none'; connect-src 'none'; style-src 'self'; base-uri 'none'; form-action 'none'"
+  }
+}
