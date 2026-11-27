@@ -53,8 +53,20 @@ export async function connect({onChange}) {
 
   async function send(id, message) {
     let reply;
-    try { reply = await chrome.tabs.sendMessage(id, message, {frameId:0}); }
-    catch { throw new Error('無法讀取訂單。初次安裝或更新後，請重新整理訂單分頁。'); }
+    // A navigation can finish just before Chrome attaches the document_idle reader.
+    // Only retry delivery of a read; an inventory request could already be running.
+    for (let attempt = 0; ; attempt++) {
+      try {
+        reply = await chrome.tabs.sendMessage(id, message, {frameId:0});
+        break;
+      } catch (error) {
+        if (message.action !== 'readOrder' || attempt >= 3 ||
+            !/Receiving end does not exist|Could not establish connection/i.test(error.message)) {
+          throw new Error('無法讀取訂單。初次安裝或更新後，請重新整理訂單分頁。');
+        }
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+    }
     if (!reply || reply.error) throw new Error(reply?.error || '後台沒有回傳可核對的資料。');
     return reply;
   }

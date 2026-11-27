@@ -102,11 +102,12 @@
     if (notes || pv) warnings.push("請對照 KPI 與其他說明，確認指定網站、曝光門檻、社群篇數與特殊權益。");
     return {sites:[...new Set(sites)],siteMinimums,facebook,warnings};
   }
-  function orderFromRows(rows, path) {
+  function orderFromRows(rows, path, requireFields=false) {
     const pathId = /^\/orders\/(\d+)\/?$/.exec(path)?.[1];
     if (!pathId) throw Error("請先開啟一張訂單的明細頁。");
     const info = valuesFromRows(rows);
     if (clean(info.id) !== pathId) throw Error("頁面與訂單編號尚未一致，請稍候再讀取。");
+    if (requireFields && !Object.keys(info).some(key=>key!=="id")) throw Error("訂單欄位仍在載入。");
     const range = dates(info.range);
     const rights = parseRights(info);
     const order = {
@@ -120,7 +121,7 @@
     };
     return {identity:pathId,order,warnings:rights.warnings};
   }
-  function readOrder() {
+  function readOrder(requireFields = false) {
     // Existing cue tables also contain dates. Only actual backend title/value pairs are order attributes.
     const rows=Array.from(document.querySelectorAll("tr"), row => {
       const pairs=[];
@@ -131,7 +132,23 @@
       }
       return pairs;
     });
-    return orderFromRows(rows, location.pathname);
+    return orderFromRows(rows,location.pathname,requireFields);
+  }
+  async function readOrderWhenReady(timeout=8000) {
+    const expectedPath=location.pathname;
+    const expectedId=/^\/orders\/(\d+)\/?$/.exec(expectedPath)?.[1];
+    if (!expectedId) throw Error("請先開啟一張訂單的明細頁。");
+    const changed="等待期間已切換訂單，請重新讀取。";
+    const ready=await waitFor(()=>{
+      if (location.pathname!==expectedPath) return {changed:true};
+      // The order screen first renders a shell and can briefly show the previous order's cells.
+      try {return readOrder(true);} catch {return null;}
+    },timeout);
+    if (ready?.changed || location.pathname!==expectedPath) throw Error(changed);
+    if (!ready) throw Error("等待訂單明細逾時：請確認已登入、訂單編號與欄位已顯示，再按「重新讀取原單」。");
+    const fresh=readOrder(true);
+    if (fresh.identity!==expectedId || location.pathname!==expectedPath) throw Error(changed);
+    return fresh;
   }
   // Only remaining/total from a labeled detail is accepted for exposure.
   function exposureRemaining(value) {
@@ -478,7 +495,7 @@
     if (location.origin!==origin) throw Error("僅支援公司訂版網站。");
     const path=location.pathname.replace(/\/$/u,"") || "/";
     switch (message.action) {
-      case "readOrder": return readOrder();
+      case "readOrder": return readOrderWhenReady();
       case "inventory": {
         const before=readOrder().identity;
         if (before!==message.identity || before!==message.order?.id) throw Error("訂單已切換，請重讀原單。");
@@ -508,6 +525,6 @@
   }
   // Pure functions for offline, synthetic regression fixtures.
   if (typeof module!=="undefined" && module.exports) module.exports={
-    orderFromRows,exposureRemaining,gridDates,socialStock,catalogPage,readCell,number,normalizedSite
+    orderFromRows,readOrderWhenReady,exposureRemaining,gridDates,socialStock,catalogPage,readCell,number,normalizedSite
   };
 })();
