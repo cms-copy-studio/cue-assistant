@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="天下廣告訂版 Cue 助手的模擬示範、Chrome 側欄安裝方式、排程規則與驗收步驟。">
+  <meta name="color-scheme" content="light">
+  <title>天下廣告訂版 Cue 助手｜操作說明</title>
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要內容</a>
+  <header class="bar">
+    <div class="wrap bar-inner">
+      <a class="brand" href="./">天下廣告訂版</a>
+      <nav aria-label="操作說明"><a href="#install">本機安裝</a><a href="#workflow">側欄操作</a><a href="#verify">驗收</a></nav>
+    </div>
+  </header>
+  <main id="main">
+    <section class="intro">
+      <div class="wrap hero">
+        <div>
+          <p class="edition">Chrome 側欄擴充功能 · v0.1.0</p>
+          <h1>Cue 助手</h1>
+          <p class="lead">從訂單讀取權益與預算，逐日核對庫存，整理出可以複製的宣傳 Cue。</p>
+          <div class="actions"><a class="button primary" href="demo/">試用模擬訂單 <span aria-hidden="true">↗</span></a><a class="button" href="downloads/cue-assistant.zip" download>下載安裝包 <span aria-hidden="true">↓</span></a></div>
+          <p class="helper">模擬展示可直接開啟。正式查詢使用同事自己登入的訂版分頁。</p>
+        </div>
+        <figure class="sample">
+          <figcaption><strong>逐日庫存怎麼看</strong><span>模擬資料</span></figcaption>
+          <p>同一版位，每日推薦曝光 <b>35,000</b> 次</p>
+          <table>
+            <thead><tr><th scope="col">日期</th><th scope="col">當日剩餘</th><th scope="col">最多可排</th></tr></thead>
+            <tbody><tr><th scope="row">6/10</th><td>42,000</td><td>35,000 <small>×1</small></td></tr>
+              <tr><th scope="row">6/11</th><td>70,000</td><td>70,000 <small>×2</small></td></tr>
+              <tr><th scope="row">6/12</th><td>未知</td><td>排除</td></tr></tbody>
+          </table>
+        </figure>
+      </div>
+    </section>
+    <div class="wrap content">
+      <section id="install" class="chapter">
+        <div class="title"><h2>在 Chrome 本機載入</h2><p>適用於公司政策允許開發人員模式的試用環境。</p></div>
+        <div class="body">
+          <ol class="steps">
+            <li>下載上方 ZIP，解壓縮至電腦中要保留的資料夾。</li>
+            <li>在 Chrome 網址列輸入 <code>chrome://extensions</code>，開啟「開發人員模式」，點「載入未封裝項目」，選取內含 <code>manifest.json</code> 的資料夾。</li>
+            <li>在同一個 Chrome 使用者設定檔登入訂版系統，重新整理原先開著的訂單頁。點擴充功能清單中的「天下廣告訂版 Cue 助手」，開啟側欄。</li>
+          </ol>
+          <p>試用版要更新時，將新版解壓至原位置，在擴充功能頁點「重新載入」，再重新整理訂單頁。正式發給同事的安裝與更新管道由公司 Chrome 管理政策決定；若選項由管理員鎖定，請洽公司 IT。</p>
+          <a class="reference" href="https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked">Chrome 本機載入說明 ↗</a>
+        </div>
+      </section>
+      <section id="workflow" class="chapter">
+        <div class="title"><h2>從訂單到 Cue</h2><p>一張訂單使用一份草案。預訂類型預設為「一般」。</p></div>
+        <div class="body">
+          <ol class="steps workflow">
+            <li><strong>核對目前訂單。</strong>比對側欄的訂單編號與案名，確認走期、可曝光網站、指定版位、各站最低曝光、Facebook 粉專與篇數。將備註內的必交權益填入對應欄位；文章 PV 獨立列為上線後追蹤項目。</li>
+            <li><strong>確認本案總預算。</strong>「訂單原始預算」供對照，「本案排 Cue 的總預算」用來比較方案。若另有不可超過的金額，才填「硬上限」。修改欄位會顯示標記，可逐欄還原；「重新讀取原單」會重建草案。</li>
+            <li><strong>按「查庫存並產生 Cue」。</strong>工具在同一登入狀態下使用查詢分頁讀取版位與費率目錄、逐日庫存明細，以及有需求的 Facebook 時段。查詢中保持訂單頁開啟。讀不到的數量、矛盾的數字或缺少價格的格會排除；剩餘量為零代表已額滿。</li>
+            <li><strong>核對後複製。</strong>比對各列的推薦量、擬訂量、剩餘庫存、價值與入選理由，檢查逐站小計、粉專時段、總價、正負差額與查詢時間。修改條件後重新查詢，再按「複製 Cue」。由承辦同事在原系統核對最新庫存並辦理正式訂版、儲存。</li>
+          </ol>
+          <details><summary>團隊預設與「個人小習慣」如何影響試排？</summary>
+            <p>試排先核對客戶權益、日期、精確庫存與各站門檻，再以網站與社群合計價值接近本案總預算。差額等於整單價值減總預算，可正可負。組合較多時採有限搜尋，可能另有更接近的方案。</p>
+            <p>3–4 個網站版位為高優先偏好，同站同位拆段只計一次，Facebook 另計。Text 優先評估同位連跑；Rectangle 與 MB 文章頁 TOP／BOTTOM 依實際素材規格評估共用 300×250。起始盡量避開週一，進行中可跨週一。Scroll Video 要核對素材與過稿時間。</p>
+            <p>在「個人小習慣」可調整版位順序、慣用連跑天數、週一起始與共用素材偏好，也能恢復團隊預設。正式側欄將偏好存於各自的 Chrome 本機。指定粉專依權益安排，只有 Facebook 篇數時採天下粉專。</p>
+          </details>
+        </div>
+      </section>
+      <section id="verify" class="chapter">
+        <div class="title"><h2>第一次使用時核對</h2><p>正式使用前，請在公司帳號與實際 Chrome 環境驗收。</p></div>
+        <div class="body">
+          <ul class="checks">
+            <li><strong>逐日精確量。</strong>在原系統點開同版位相鄰兩天，逐格比對明細中的剩餘曝光。再回到第一天，確認日期與數字仍對應。遇到色塊未載入、明細讀取失敗，檢查側欄顯示的未知或排除原因。社群另核對粉專、時段、次數和價格。</li>
+            <li><strong>更改條件。</strong>調整總預算，重新試排並比較差額。用模擬案例檢查剛好一倍與足兩倍的庫存。指定單一網站曝光門檻時，以該站小計核對。</li>
+            <li><strong>切換訂單。</strong>在 A 單修改條件、產生 Cue，再切到 B 單。核對 B 的編號、欄位和複製狀態，包含查詢未完成時切換的情況。</li>
+          </ul>
+          <p>庫存會隨其他同事的操作變動。複製的內容是查詢當刻的試排，正式儲存前請再次核對。</p>
+        </div>
+      </section>
+      <section id="privacy" class="chapter last">
+        <div class="title"><h2>資料在哪裡</h2></div>
+        <div class="body">
+          <p><strong>正式側欄</strong>隨安裝包提供所有執行程式，只讀取天下訂版網域。訂單、編輯草案與即時庫存在瀏覽器內暫時處理，長期只保存個人偏好。按下複製後，Cue 會進入該裝置的剪貼簿。查詢範圍取決於個人公司帳號在訂版系統中的權限。</p>
+          <p><strong>這個 GitHub Pages 網站</strong>提供說明、下載和合成案例。試玩時請使用模擬資料。GitHub 會基於安全目的記錄網站訪客的 IP。正式側欄處理的案件內容留在本機，不會送到此展示網站。</p>
+          <a class="reference" href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection">GitHub Pages 資料收集說明 ↗</a>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
