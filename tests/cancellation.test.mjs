@@ -98,3 +98,14 @@ test("切換同分頁的訂單後，先前庫存及舊稿複製身分檢查均�
   await assert.rejects(source.assertIdentity("901"),/切換/);
   assert.equal((await source.read()).identity,"902");
 });
+
+test("訂單完成導覽後稍晚才裝上讀取程式，側欄自動重新送出讀單", async t => {
+  let reads = 0;
+  const {source} = await mockChrome(t,async (msg,id) => {
+    assert.equal(msg.action,'readOrder');
+    if (++reads === 1) throw Error('Could not establish connection. Receiving end does not exist.');
+    return orderReply(id);
+  });
+  assert.equal((await source.read()).identity,'901');
+  assert.equal(reads,2);
+});

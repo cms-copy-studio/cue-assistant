@@ -104,3 +104,51 @@ test("successive live-shaped cell popups return A→B→A; a missing popup is un
   };
   assert.equal(await dom.readCell(stale,state),null);
 });
+function loadingOrder() {
+  let rows=[], notify=()=>{};
+  const location={pathname:"/orders/101/"};
+  class Observer {
+    constructor(fn){this.callback=fn;}
+    observe(){notify=this.callback;}
+    disconnect(){notify=()=>{};}
+  }
+  const document={documentElement:{},querySelectorAll:()=>rows};
+  const api=reader({document,location,MutationObserver:Observer});
+  return {
+    read:timeout=>api.readOrderWhenReady(timeout),
+    render(pairs,path=location.pathname) {
+      location.pathname=path;
+      rows=pairs.map(row=>({cells:row.map((innerText,i)=>({
+        innerText, matches:()=>i%2===0,
+        nextElementSibling:{innerText:row[i+1],matches:()=>true}
+      }))}));
+      notify();
+    }
+  };
+}
+test("readOrder waits through an empty shell, old order and id-only intermediate render",async()=>{
+  const screen=loadingOrder();
+  const pending=screen.read(100);
+  screen.render([["訂單編號","999","訂單名稱","示意舊單"]]);
+  screen.render([["訂單編號","101"]]);
+  screen.render([["訂單編號","101","訂單名稱","載入完成"]]);
+  const result=await pending;
+  assert.equal(result.identity,"101");
+  assert.equal(result.order.name,"載入完成");
+  assert.equal(result.order.originalBudget,null);
+});
+test("navigation during readiness or before delivery rejects the original read",async()=>{
+  const screen=loadingOrder();
+  const pending=screen.read(100);
+  screen.render([["訂單編號","202","訂單名稱","另一張"]],"/orders/202");
+  await assert.rejects(pending,/切換訂單/);
+  const first=loadingOrder(),race=first.read(100);
+  first.render([["訂單編號","101","訂單名稱","第一張"]]);
+  first.render([["訂單編號","303","訂單名稱","第三張"]],"/orders/303");
+  await assert.rejects(race,/切換訂單/);
+});
+test("a shell with no matching read-only fields ends with a bounded retry instruction",async()=>{
+  const screen=loadingOrder();
+  screen.render([["訂單編號","101"]]);
+  await assert.rejects(screen.read(15),/逾時.*重新讀取原單/);
+});
