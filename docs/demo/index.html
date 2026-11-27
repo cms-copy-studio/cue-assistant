@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>天下廣告訂版 Cue 助手</title>
+  <link rel="stylesheet" href="./panel.css">
+  <script type="module" src="./panel.mjs"></script>
+</head>
+<body>
+<header class="mast"><div><p class="product">天下廣告訂版</p><h1>Cue 助手</h1></div><span id="mode">只讀試排</span></header>
+<main>
+  <nav id="demo-nav" hidden aria-label="模擬操作"><div class="demo-note"><strong>模擬資料展示</strong><a href="../">操作說明 ↗</a></div><label for="scenario">切換案例</label><select id="scenario"></select></nav>
+  <section class="order-bar" aria-label="目前訂單"><div><small>目前訂單</small><strong id="identity">讀取中</strong></div><button type="button" id="reload">重新讀取原單</button></section>
+  <p class="feedback" id="status" role="status" aria-live="polite">正在連接分頁…</p>
+  <aside id="read-warnings" class="notice" hidden></aside>
+  <div class="workspace">
+    <div class="editor">
+      <section class="surface" aria-labelledby="order-title">
+        <div class="section-head"><h2 id="order-title">訂單條件</h2><span id="dirty-count"></span></div>
+        <fieldset id="order-fields" disabled>
+          <div id="base" class="fields"></div>
+          <div id="dates" class="fields pair"></div>
+          <div id="money" class="fields pair"></div>
+          <h3 class="rule">曝光與社群權益</h3>
+          <div id="rights" class="fields"></div>
+          <details id="more-box" class="disclosure"><summary>預算上限、文章 KPI 與備註</summary><div id="more" class="fields"></div></details>
+          <div id="review-wrap" class="review" hidden><label><input type="checkbox" id="review">我已核對原單備註，並將本案必交權益填入上方條件。</label></div>
+        </fieldset>
+      </section>
+      <details class="surface preferences"><summary>個人小習慣</summary>
+        <form id="prefs-form">
+          <p class="note" id="prefs-note">偏好儲存在這台 Chrome，只影響合格方案的排序。</p>
+          <label for="pref-order">常用版位順序</label><textarea id="pref-order" rows="2" required></textarea>
+          <label for="pref-days">慣用連跑天數</label><input id="pref-days" type="number" min="1" max="366" step="1" required>
+          <label class="check"><input type="checkbox" id="pref-monday">宣傳起始盡量避開週一</label>
+          <label class="check"><input type="checkbox" id="pref-shared">優先考慮可共用素材的版位</label>
+          <div class="button-row"><button type="submit" id="save-prefs">儲存偏好</button><button type="button" id="reset-prefs" class="quiet">恢復團隊預設</button></div>
+          <p id="prefs-status" class="feedback" role="status"></p>
+        </form>
+      </details>
+    </div>
+    <section class="surface results" aria-labelledby="result-title">
+      <div class="section-head"><h2 id="result-title" tabindex="-1">Cue 試排</h2><span id="result-tag">待查庫存</span></div>
+      <div id="result-body"><p class="empty">核對訂單條件後，查詢庫存以查看逐日配置及預算差額。</p></div>
+    </section>
+  </div>
+</main>
+<footer class="action-bar"><div><button type="button" id="query" class="primary" disabled>查庫存並產生 Cue</button><button type="button" id="copy" disabled>複製 Cue</button></div></footer>
+</body>
+</html>
